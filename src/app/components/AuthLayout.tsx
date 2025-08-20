@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
     return (
-        <div className="flex flex-col min-h-screen relative">
+        <div className="flex flex-col min-h-screen relative bg-white">
             {/* Main Content */}
             <main className="flex flex-1 items-center justify-center z-10">
                 {children}
