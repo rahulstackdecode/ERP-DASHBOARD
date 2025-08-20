@@ -105,7 +105,7 @@ export default function Sidebar({ isOpen }: { isOpen: boolean }) {
           <Logo className="logo-dashboard" />
         ) : (
           <Image
-            src="/images/icon-logo.png"
+            src="/icon-logo.png"
             alt="Logo Icon"
             width={30}
             height={30}
