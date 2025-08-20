@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
     return (
@@ -8,10 +9,12 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                 {children}
             </main>
             <div className="absolute bottom-0 w-full h-[520px] overflow-hidden">
-                <img
+                <Image
                     src="/images/bg-image.svg"
-                    alt="Background"
-                    className="w-full h-full inset-0 object-cover"
+                    alt="Shape Bg"
+                    fill
+                    priority
+                    className="object-cover"
                 />
             </div>
             {/* Footer */}
