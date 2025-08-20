@@ -7,7 +7,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             {/* Main Content */}
             <main className="flex flex-1 items-center justify-center z-10">
                 {children}
-            </main>
+            </main>  
             <div className="absolute bottom-0 w-full h-[520px] overflow-hidden">
                 <Image
                     src="/images/bg-image.svg"
