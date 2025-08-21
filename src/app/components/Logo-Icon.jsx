@@ -1,12 +1,19 @@
+// Logo-Icon.jsx
 import Link from "next/link";
+import Image from "next/image";
 
 export default function LogoIcon({ className }) {
-    return (
-        <div className={`logo-wrapper flex items-center ${className}`}>
-            <Link href="/">
-               <img src="/icon-logo.png" alt="Icon Logo" width={30} height={30} />
-
-            </Link>
-        </div>
-    );
+  return (
+    <div className={`logo-wrapper flex items-center ${className || ""}`}>
+      <Link href="/">
+        <Image
+          src="/icon-logo.png"
+          alt="Icon Logo"
+          width={30}
+          height={30}
+          priority
+        />
+      </Link>
+    </div>
+  );
 }

@@ -95,14 +95,14 @@ export default function Sidebar({ isOpen }: { isOpen: boolean }) {
       transition={{ type: "spring", stiffness: 260, damping: 30 }}
       className="sticky top-0 hidden lg:visible bg-white h-screen lg:flex flex-col shadow-[0px_10px_60px_0px_#E2ECF980] "
     >
-      {/* Logo */}
       <div className="px-2 py-6 flex items-center justify-center">
         {isOpen ? (
-          <Logo key="logo-open" className="logo-dashboard" />
+          <Logo className="logo-dashboard" />
         ) : (
-          <LogoIcon key="logo-closed" className="logo-icon" />
+          <LogoIcon className="logo-icon" />
         )}
       </div>
+
 
       {/* Menu */}
       <nav className="flex-1 p-2 overflow-y-auto overflow-x-hidden">
