@@ -1,6 +1,7 @@
 "use client";
 import { useState, ReactNode } from "react";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import Logo from "@/app/components/Logo";
 import {
   Home,
@@ -53,11 +54,7 @@ const menuItems: MenuItem[] = [
     icon: <UsersRound size={18} />,
     children: [
       { label: "Clients List", href: "#", icon: <UserCheck size={16} /> },
-      {
-        label: "Invoices & Payments",
-        href: "#",
-        icon: <DollarSign size={16} />,
-      },
+      { label: "Invoices & Payments", href: "#", icon: <DollarSign size={16} /> },
     ],
   },
   {
@@ -73,11 +70,7 @@ const menuItems: MenuItem[] = [
     icon: <Settings size={18} />,
     children: [
       { label: "Profile", href: "#", icon: <User size={16} /> },
-      {
-        label: "Department Manage",
-        href: "#",
-        icon: <Briefcase size={16} />,
-      },
+      { label: "Department Manage", href: "#", icon: <Briefcase size={16} /> },
       { label: "Role & Permission", href: "#", icon: <UserCog size={16} /> },
     ],
   },
@@ -95,32 +88,28 @@ export default function Sidebar({ isOpen }: { isOpen: boolean }) {
   };
 
   return (
-    <aside
-      className={`${isOpen ? "w-64" : "w-14"}
-        bg-white h-screen fixed top-0 left-0 transition-all duration-300 flex flex-col shadow-[0px_10px_60px_0px_#E2ECF980]`}
+    <motion.aside
+      initial={{ width: 256 }}
+      animate={{ width: isOpen ? 256 : 56 }}
+      transition={{ type: "spring", stiffness: 260, damping: 30 }}
+      className="sticky top-0 hidden lg:visible bg-white h-screen lg:flex flex-col shadow-[0px_10px_60px_0px_#E2ECF980] "
     >
       {/* Logo */}
       <div className="px-2 py-6 flex items-center justify-center">
         {isOpen ? (
           <Logo className="logo-dashboard" />
         ) : (
-          <Image
-            src="/icon-logo.png"
-            alt="Logo Icon"
-            width={30}
-            height={30}
-          />
+          <Image src="/icon-logo.png" alt="Logo Icon" width={30} height={30} />
         )}
       </div>
 
       {/* Menu */}
-      <nav className="flex-1 p-2 overflow-y-auto">
+      <nav className="flex-1 p-2 overflow-y-auto overflow-x-hidden">
         <ul className="space-y-2">
           {menuItems.map((item) => (
             <li key={item.label} className="mb-3">
               {item.children ? (
                 <>
-                  {/* Parent with toggle */}
                   <button
                     onClick={() => toggleSubmenu(item.label)}
                     className={`w-full flex items-center justify-between rounded-[5px] font-medium text-[14px] px-[10px] py-[10px] transition-colors duration-200
@@ -131,7 +120,7 @@ export default function Sidebar({ isOpen }: { isOpen: boolean }) {
                   >
                     <div className="flex items-center gap-3">
                       {item.icon}
-                      {isOpen && <span>{item.label}</span>}
+                      {isOpen && <span className="whitespace-nowrap">{item.label}</span>}
                     </div>
                     {isOpen &&
                       (openMenus.includes(item.label) ? (
@@ -143,13 +132,19 @@ export default function Sidebar({ isOpen }: { isOpen: boolean }) {
 
                   {/* Submenu */}
                   {openMenus.includes(item.label) && isOpen && (
-                    <ul className="mt-1 space-y-1 p-3 bg-[#F7F7F7] rounded-[5px]">
+                    <motion.ul
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="mt-1 space-y-1 p-3 bg-[#F7F7F7] rounded-[5px]"
+                    >
                       {item.children.map((sub) => (
-                        <li key={sub.label}>
+                        <li key={sub.label} className="whitespace-nowrap">
                           <a
                             href={sub.href}
                             onClick={() => setActiveMenu(sub.label)}
-                            className={`flex items-center gap-3 rounded-[5px] font-medium text-[14px] px-[10px] py-[10px] transition-colors duration-200
+                            className={`flex items-center gap-3 whitespace-nowrap rounded-[5px] font-medium text-[14px] px-[10px] py-[10px] transition-colors duration-200
                               ${activeMenu === sub.label
                                 ? "bg-[color:var(--primary-color)] text-[color:var(--white-text)]"
                                 : "text-[color:var(--heading-color)] hover:bg-[color:var(--primary-color)] hover:text-[color:var(--white-text)]"
@@ -160,7 +155,7 @@ export default function Sidebar({ isOpen }: { isOpen: boolean }) {
                           </a>
                         </li>
                       ))}
-                    </ul>
+                    </motion.ul>
                   )}
                 </>
               ) : (
@@ -174,7 +169,7 @@ export default function Sidebar({ isOpen }: { isOpen: boolean }) {
                     }`}
                 >
                   {item.icon}
-                  {isOpen && <span>{item.label}</span>}
+                  {isOpen && <span className="whitespace-nowrap">{item.label}</span>}
                 </a>
               )}
             </li>
@@ -183,12 +178,12 @@ export default function Sidebar({ isOpen }: { isOpen: boolean }) {
       </nav>
 
       {/* Logout */}
-      <div className="py-4 px-2 border-t border-[var(--border-light)]">
+      <div className="py-4 px-2">
         <button className="w-full flex items-center justify-center font-medium gap-3 px-2 cursor-pointer py-2.5 text-white bg-red-500 rounded-md hover:bg-red-600 text-center">
           <LogOut size={18} />
           {isOpen && <span>Logout</span>}
         </button>
       </div>
-    </aside>
+    </motion.aside>
   );
 }

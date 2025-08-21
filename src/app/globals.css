@@ -11,10 +11,10 @@
   --border-light: #567D8E33;
   --radius-xl: 10px;
   --color-red-600: #E52626;
-  --color-red-500:#E70D0D;
+  --color-red-500: #E70D0D;
   --text-green-600: #00B155;
   --btn-hover-bg: #0267b8;
-  --white-text:#ffffff;
+  --white-text: #ffffff;
 }
 
 @theme inline {
@@ -39,6 +39,11 @@ body {
   font-weight: 400;
   font-size: 16px;
 
+}
+
+.wrapper {
+  max-width: 1520px;
+  margin: 0 auto;
 }
 
 h1,
@@ -77,25 +82,26 @@ select {
 
 /* Scrollbar Styling */
 ::-webkit-scrollbar {
-  width: 4px;              
-  height: 4px;             
+  width: 4px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;     
+  background: #f1f1f1;
   border-radius: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #06A6F0; 
+  background-color: #06A6F0;
   border-radius: 8px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #048ac7; 
+  background-color: #048ac7;
 }
 
 .search-form input {
-    box-shadow: none;
-    outline: none;
+  box-shadow: none;
+  outline: none;
 }
+
