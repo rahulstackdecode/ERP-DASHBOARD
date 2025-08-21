@@ -97,7 +97,8 @@ export default function Sidebar({ isOpen }: { isOpen: boolean }) {
     >
       <div className="px-2 py-6 flex items-center justify-center">
         {isOpen ? (
-          <Logo className="logo-dashboard" />
+          // <Logo className="logo-dashboard" />
+            <LogoIcon className="logo-icon" />
         ) : (
           <LogoIcon className="logo-icon" />
         )}
