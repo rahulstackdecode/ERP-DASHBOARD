@@ -3,6 +3,7 @@ import { useState, ReactNode } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import Logo from "@/app/components/Logo";
+import LogoIcon from "@/app/components/Logo-Icon"
 import {
   Home,
   Users,
@@ -99,7 +100,7 @@ export default function Sidebar({ isOpen }: { isOpen: boolean }) {
         {isOpen ? (
           <Logo className="logo-dashboard" />
         ) : (
-          <Image src="/icon-logo.png" alt="Logo Icon" width={30} height={30} />
+          <LogoIcon className="logo-icon"/>
         )}
       </div>
 
