@@ -13,7 +13,6 @@ import {
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 export default function EmployeesChart() {
-  // ✅ Define types explicitly
   const data: ChartData<"doughnut"> = {
     labels: ["Business", "Design", "Development", "Testing"],
     datasets: [
@@ -26,25 +25,26 @@ export default function EmployeesChart() {
     ],
   };
 
- const options: ChartOptions<"doughnut"> = {
-  responsive: true,
-  cutout: "75%", // inner circle size (higher = thinner ring)
-  radius: "80%", // overall circle size (smaller = smaller circle)
-  plugins: {
-    legend: {
-      position: "bottom",
+  const options: ChartOptions<"doughnut"> = {
+    responsive: true,
+    maintainAspectRatio: false, // ✅ Disable automatic aspect ratio
+    cutout: "75%", 
+    radius: "80%",
+    plugins: {
+      legend: {
+        position: "bottom",
+      },
     },
-  },
-};
-
+  };
 
   return (
-    <div className="p-4 min-h-[454.2px] flex items-center flex-col justify-center bg-white rounded-2xl border border-[#ECECEC]">
+    <div className="p-4 flex flex-col items-center justify-center bg-white rounded-2xl border border-[#ECECEC]">
       <div className="flex justify-center items-center mt-3 -mb-2">
         <h2 className="font-semibold text-center">TOTAL EMPLOYEES</h2>
       </div>
-      {/* ✅ Works with typed data & options */}
-      <Doughnut data={data} options={options} />
+      <div className="w-full h-[300px] md:h-[350px] lg:h-[400px]"> {/* ✅ Fixed height */}
+        <Doughnut data={data} options={options} />
+      </div>
     </div>
   );
 }

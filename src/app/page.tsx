@@ -72,19 +72,25 @@ export default function HomePage() {
                   <SalesChart key={isOpen ? "open" : "closed"} />
                 </div>
 
-                {/* Projects & Employees Charts */}
                 <div className="project-charts flex flex-col lg:flex-row gap-5 mt-6">
+                  {/* Projects Chart */}
                   <div className="project-col w-full lg:flex-1 min-w-0">
-                    <div className="w-full h-auto lg:h-[450px]">
+                    <div className="w-full">
                       <ProjectsChart key={isOpen ? "open" : "closed"} />
                     </div>
                   </div>
-                  <div className="employees-col w-full lg:flex-1 min-w-0 mx-auto max-w-[100%] md:max-w-[40%] md:mx-auto lg:max-w-[40%] xl:max-w-[34%]">
-                    <div className="w-full h-[450px]">
+
+                  {/* Employees Chart */}
+                  <div className="employees-col w-full lg:w-[35%] min-w-0">
+                    <div className="w-full">
                       <EmployeesChart key={isOpen ? "open" : "closed"} />
                     </div>
                   </div>
                 </div>
+
+
+
+
               </div>
               {/* Footer */}
               <FooterCopyright />

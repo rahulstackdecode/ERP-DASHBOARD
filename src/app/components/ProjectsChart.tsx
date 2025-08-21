@@ -65,24 +65,25 @@ export default function ProjectsChart() {
   const options = {
     indexAxis: "y" as const,
     responsive: true,
+    maintainAspectRatio: false, // ✅ Disable auto-resizing of height
     plugins: {
       legend: { position: "bottom" as const },
     },
     scales: {
-     x: {
-      stacked: true,
-      grid: {
-        drawBorder: false,
-        display: true, 
+      x: {
+        stacked: true,
+        grid: {
+          drawBorder: false,
+          display: true,
+        },
       },
-    },
-    y: {
-      stacked: true,
-      grid: {
-        drawBorder: false,
-        display: false, 
+      y: {
+        stacked: true,
+        grid: {
+          drawBorder: false,
+          display: false,
+        },
       },
-    },
     },
   };
 
@@ -144,7 +145,10 @@ export default function ProjectsChart() {
         </div>
       </div>
 
-      <Bar data={data} options={options} />
+      {/* ✅ Fixed height container */}
+      <div className="w-full h-[300px] md:h-[350px] lg:h-[378px]">
+        <Bar data={data} options={options} />
+      </div>
     </div>
   );
 }
