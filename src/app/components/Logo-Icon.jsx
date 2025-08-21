@@ -7,7 +7,7 @@ export default function LogoIcon({ className }) {
     <div className={`logo-wrapper flex items-center ${className || ""}`}>
       <Link href="/">
         <Image
-          src="/icon-logo.png"
+          src="/logo.svg"
           alt="Icon Logo"
           width={30}
           height={30}
