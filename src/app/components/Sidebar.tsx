@@ -96,11 +96,11 @@ export default function Sidebar({ isOpen }: { isOpen: boolean }) {
       className="sticky top-0 hidden lg:visible bg-white h-screen lg:flex flex-col shadow-[0px_10px_60px_0px_#E2ECF980] "
     >
       {/* Logo */}
-      <div className="px-2 py-6 flex items-center justify-center"> 
+      <div className="px-2 py-6 flex items-center justify-center">
         {isOpen ? (
-          <Logo className="logo-dashboard" />
+          <Logo key="logo-open" className="logo-dashboard" />
         ) : (
-          <LogoIcon className="logo-icon"/>
+          <LogoIcon key="logo-closed" className="logo-icon" />
         )}
       </div>
 
