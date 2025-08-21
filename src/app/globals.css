@@ -105,3 +105,8 @@ select {
   outline: none;
 }
 
+@media all and (max-width:1023px) {
+  header.topbar-header {
+    padding-left: 58px !important;
+  }
+}
