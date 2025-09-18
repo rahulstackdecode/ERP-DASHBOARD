@@ -11,31 +11,86 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
+import { supabase } from "@/lib/supabaseClient";
+import { useRouter } from "next/navigation";
 
 export default function Topbar({ toggleSidebar }: { toggleSidebar: () => void }) {
+  const router = useRouter();
   const [notifOpen, setNotifOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [userName, setUserName] = useState("Loading...");
+  const [userEmail, setUserEmail] = useState("");
+  const [userImage, setUserImage] = useState<string | null>(null); // <- dynamic profile image
 
   const notifRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
   const notifTimeout = useRef<NodeJS.Timeout | null>(null);
   const profileTimeout = useRef<NodeJS.Timeout | null>(null);
 
-  // Close when clicking outside
+  // Fetch user data from Supabase
   useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
-        setNotifOpen(false);
+    const fetchUserData = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (session?.user?.id) {
+        setUserEmail(session.user.email || "");
+
+        const { data: userData, error } = await supabase
+          .from("users")
+          .select("name, profile_image") // <- fetch profile_image column
+          .eq("auth_id", session.user.id)
+          .single();
+
+        if (!error && userData) {
+          setUserName(userData.name || "Guest");
+          setUserImage(userData.profile_image || null); // <- dynamic image
+        } else {
+          setUserName("Guest");
+          console.error("Error fetching user:", error);
+        }
+      } else {
+        setUserName("Guest");
       }
-      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
-        setProfileOpen(false);
+    };
+
+    fetchUserData();
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user?.id) {
+        setUserEmail(session.user.email || "");
+        supabase
+          .from("users")
+          .select("name, profile_image")
+          .eq("auth_id", session.user.id)
+          .single()
+          .then(({ data: userData }) => {
+            if (userData) {
+              setUserName(userData.name || "Guest");
+              setUserImage(userData.profile_image || null);
+            } else setUserName("Guest");
+          });
+      } else {
+        setUserName("Guest");
+        setUserEmail("");
+        setUserImage(null);
       }
-    }
+    });
+
+    return () => listener.subscription.unsubscribe();
+  }, []);
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) setNotifOpen(false);
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) setProfileOpen(false);
+    };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Hover handlers
   const handleNotifMouseEnter = () => {
     if (notifTimeout.current) clearTimeout(notifTimeout.current);
     setNotifOpen(true);
@@ -50,6 +105,12 @@ export default function Topbar({ toggleSidebar }: { toggleSidebar: () => void })
   };
   const handleProfileMouseLeave = () => {
     profileTimeout.current = setTimeout(() => setProfileOpen(false), 300);
+  };
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (!error) router.push("/login"); 
+    else console.error("Logout error:", error.message);
   };
 
   return (
@@ -69,10 +130,7 @@ export default function Topbar({ toggleSidebar }: { toggleSidebar: () => void })
             placeholder="Search"
             className="w-full pl-9 pr-3 py-2.5 text-sm border border-[#D5D5D5] rounded-md bg-[#F5F6FA] focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-color)]"
           />
-          <Search
-            size={18}
-            className="search-icon absolute left-2.5 top-1/2 -translate-y-1/2"
-          />
+          <Search size={18} className="search-icon absolute left-2.5 top-1/2 -translate-y-1/2" />
         </div>
       </div>
 
@@ -104,7 +162,7 @@ export default function Topbar({ toggleSidebar }: { toggleSidebar: () => void })
               </button>
             </div>
 
-            {/* List */}
+            {/* Notification List */}
             <ul className="max-h-80 overflow-y-auto">
               <li className="flex items-start gap-3 px-4 py-3 border-b border-[#F1F1F1] hover:bg-gray-50">
                 <span className="w-9 h-9 flex items-center justify-center bg-gray-100 rounded-full text-[var(--primary-color)]">
@@ -118,30 +176,15 @@ export default function Topbar({ toggleSidebar }: { toggleSidebar: () => void })
               <li className="flex items-start gap-3 px-4 py-3 border-b border-[#F1F1F1] hover:bg-gray-50">
                 <span className="w-9 h-9 flex items-center justify-center bg-gray-100 rounded-full text-[var(--primary-color)]">
                   <Image
-                    src="/images/user-img.png"
-                    alt="user"
+                    src={userImage || "/images/user-img.png"}
+                    alt="User Img"
                     width={36}
                     height={36}
-                    className="rounded-full"
+                    className="rounded-full object-cover w-[36px] h-[36px]"
                   />
                 </span>
                 <div className="flex-1">
                   <p className="text-sm text-[#2C2C2C]">A new user added in Daxa</p>
-                  <span className="text-xs text-gray-400">3 hrs ago</span>
-                </div>
-              </li>
-              <li className="flex items-start gap-3 px-4 py-3 border-b border-[#F1F1F1] hover:bg-gray-50">
-                <span className="w-9 h-9 flex items-center justify-center bg-gray-100 rounded-full text-[var(--primary-color)]">
-                  <Image
-                    src="/images/user-img.png"
-                    alt="user"
-                    width={36}
-                    height={36}
-                    className="rounded-full"
-                  />
-                </span>
-                <div className="flex-1">
-                  <p className="text-sm text-[#2C2C2C]">A new user added in Daxa Test</p>
                   <span className="text-xs text-gray-400">3 hrs ago</span>
                 </div>
               </li>
@@ -169,19 +212,17 @@ export default function Topbar({ toggleSidebar }: { toggleSidebar: () => void })
         >
           <button className="flex items-center gap-2 cursor-pointer">
             <Image
-              src="/images/user-img.png"
+              src={userImage || "/images/user-img.png"}
               alt="User Img"
               width={40}
               height={40}
-              className="rounded-full"
+              className="rounded-full object-cover w-[40px] h-[40px]"
             />
             <span className="hidden md:flex items-center gap-1 text-[#2C2C2C]">
-              Admirra John
+              {userName}
               <ChevronDown
                 size={16}
-                className={`transition-transform duration-300 ${
-                  profileOpen ? "rotate-180" : "rotate-0"
-                }`}
+                className={`transition-transform duration-300 ${profileOpen ? "rotate-180" : "rotate-0"}`}
               />
             </span>
           </button>
@@ -202,7 +243,10 @@ export default function Topbar({ toggleSidebar }: { toggleSidebar: () => void })
                 </button>
               </li>
               <li>
-                <button className="flex items-center gap-2 w-full px-4 py-2.5 text-[#2C2C2C] hover:bg-[var(--primary-color)] hover:text-white transition">
+                <button
+                  onClick={handleLogout}
+                  className=" cursor-pointer flex items-center gap-2 w-full px-4 py-2.5 text-[#2C2C2C] hover:bg-[var(--primary-color)] hover:text-white transition"
+                >
                   <LogOut size={18} /> Logout
                 </button>
               </li>

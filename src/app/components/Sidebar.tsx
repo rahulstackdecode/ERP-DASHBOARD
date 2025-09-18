@@ -1,9 +1,11 @@
 "use client";
+
 import { useState, ReactNode } from "react";
-import Image from "next/image";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabaseClient";
 import Logo from "@/app/components/Logo";
-import LogoIcon from "@/app/components/Logo-Icon"
+import LogoIcon from "@/app/components/Logo-Icon";
 import {
   Home,
   Users,
@@ -23,6 +25,7 @@ import {
   BarChart,
   UserCog,
   Briefcase,
+  Loader2,
 } from "lucide-react";
 
 type SubMenuItem = {
@@ -80,7 +83,9 @@ const menuItems: MenuItem[] = [
 
 export default function Sidebar({ isOpen }: { isOpen: boolean }) {
   const [openMenus, setOpenMenus] = useState<string[]>([]);
-  const [activeMenu, setActiveMenu] = useState<string>("Dashboard"); // Default active
+  const [activeMenu, setActiveMenu] = useState<string>("Dashboard");
+  const [loggingOut, setLoggingOut] = useState(false);
+  const router = useRouter();
 
   const toggleSubmenu = (label: string) => {
     setOpenMenus((prev) =>
@@ -88,23 +93,49 @@ export default function Sidebar({ isOpen }: { isOpen: boolean }) {
     );
   };
 
+  const handleLogout = async () => {
+    setLoggingOut(true);
+
+    try {
+      // Check if session exists first
+      const { data: sessionData } = await supabase.auth.getSession();
+      const session = sessionData.session;
+
+      if (!session) {
+        console.warn("Logout: Auth session missing!");
+        router.replace("/login");
+        setLoggingOut(false);
+        return;
+      }
+
+      // Sign out
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("Logout error:", error.message);
+        setLoggingOut(false);
+        return;
+      }
+
+      router.replace("/login");
+      setLoggingOut(false);
+    } catch (err) {
+      console.error("Logout failed:", err);
+      setLoggingOut(false);
+      router.replace("/login");
+    }
+  };
+
   return (
     <motion.aside
       initial={{ width: 256 }}
       animate={{ width: isOpen ? 256 : 56 }}
       transition={{ type: "spring", stiffness: 260, damping: 30 }}
-      className="sticky top-0 hidden lg:visible bg-white h-screen lg:flex flex-col shadow-[0px_10px_60px_0px_#E2ECF980] "
+      className="sticky top-0 hidden lg:visible bg-white h-screen lg:flex flex-col shadow-[0px_10px_60px_0px_#E2ECF980]"
     >
-
+      {/* Logo */}
       <div className="px-2 py-6 flex items-center justify-center">
-        {isOpen ? (
-          <Logo className="logo-dashboard" />
-        ) : (
-          <LogoIcon className="logo-icon" />
-        )}
+        {isOpen ? <Logo className="logo-dashboard" /> : <LogoIcon className="logo-icon" />}
       </div>
-      
-
 
       {/* Menu */}
       <nav className="flex-1 p-2 overflow-y-auto overflow-x-hidden">
@@ -126,11 +157,7 @@ export default function Sidebar({ isOpen }: { isOpen: boolean }) {
                       {isOpen && <span className="whitespace-nowrap">{item.label}</span>}
                     </div>
                     {isOpen &&
-                      (openMenus.includes(item.label) ? (
-                        <ChevronDown size={16} />
-                      ) : (
-                        <ChevronRight size={16} />
-                      ))}
+                      (openMenus.includes(item.label) ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
                   </button>
 
                   {/* Submenu */}
@@ -182,9 +209,19 @@ export default function Sidebar({ isOpen }: { isOpen: boolean }) {
 
       {/* Logout */}
       <div className="py-4 px-2">
-        <button className="w-full flex items-center justify-center font-medium gap-3 px-2 cursor-pointer py-2.5 text-white bg-red-500 rounded-md hover:bg-red-600 text-center">
-          <LogOut size={18} />
-          {isOpen && <span>Logout</span>}
+        <button
+          onClick={handleLogout}
+          disabled={loggingOut}
+          className={`w-full flex items-center justify-center font-medium gap-3 px-2 cursor-pointer py-2.5 text-white bg-red-500 rounded-md hover:bg-red-600 text-center ${
+            loggingOut ? "opacity-70 cursor-not-allowed" : ""
+          }`}
+        >
+          {loggingOut ? (
+            <Loader2 className="animate-spin" size={18} />
+          ) : (
+            <LogOut size={18} />
+          )}
+          {isOpen && <span>{loggingOut ? "Logging out..." : "Logout"}</span>}
         </button>
       </div>
     </motion.aside>

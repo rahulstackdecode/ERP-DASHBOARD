@@ -102,8 +102,37 @@ select {
   outline: none;
 }
 
+.filter-select {
+  appearance: none;
+}
+
+select {
+  background-image: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.react-datepicker__month-text {
+  font-size: 15px !important;
+  margin: 5px 0px !important;
+    border-radius: 2px !important;
+  padding: 2px !important
+}
+
+.react-datepicker__month-text.react-datepicker__month-text--selected {
+  background: #06a6f0 !important;
+  border-radius: 2px !important;
+
+}
+
 @media all and (max-width:1023px) {
   header.topbar-header {
     padding-left: 58px !important;
+  }
+}
+
+@media all and (max-width:767px) {
+  .react-datepicker-wrapper {
+    width: 100%;
   }
 }

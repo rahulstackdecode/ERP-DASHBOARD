@@ -1,36 +1,49 @@
 "use client";
-import { Ban, CircleCheckBig } from "lucide-react";
+import { Ban, CircleCheckBig, Loader2 } from "lucide-react";
 import { useState } from "react";
 import AuthLayout from "@/app/components/AuthLayout";
 import Logo from "@/app/components/Logo";
-import { forgotErrors } from "@/app/(auth)/constants/errors";
+import { supabase } from "@/lib/supabaseClient"; // adjust path
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState<{ email?: string; form?: string }>({});
   const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError({});
     setSuccess("");
+    setLoading(true);
 
     if (!email) {
-      setError({ email: forgotErrors.email.empty });
+      setError({ email: "Email is required" });
+      setLoading(false);
       return;
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      setError({ email: forgotErrors.email.invalid });
+      setError({ email: "Invalid email format" });
+      setLoading(false);
       return;
     }
 
-    // Mock: check if email exists
-    if (email !== "john.doe@gmail.com") {
-      setError({ email: forgotErrors.email.notFound });
-      return;
-    }
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/set-new-password`, // redirect after reset
+      });
 
-    // Success
-    setSuccess(forgotErrors.form.success);
+      if (error) {
+        setError({ form: error.message });
+        setLoading(false);
+        return;
+      }
+
+      setSuccess("Password reset email sent! Please check your inbox.");
+    } catch (err: any) {
+      setError({ form: err.message || "Something went wrong" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -42,13 +55,12 @@ export default function ForgotPasswordPage() {
           <h2 className="text-3xl sm:text-4xl text-center mb-2 sm:mb-4 font-semibold">
             Forgot your password?
           </h2>
-          <p className=" text-center mb-8 sm:mb-10 text-sm sm:text-base">
+          <p className="text-center mb-8 sm:mb-10 text-sm sm:text-base">
             Enter your email below to recover your password
           </p>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Email */}
             <div className="relative">
               <input
                 type="email"
@@ -81,19 +93,20 @@ export default function ForgotPasswordPage() {
               )}
             </div>
 
-            {/* Submit */}
             <button
               type="submit"
-              className="w-full py-3 px-2 mt-2 font-semibold text-white rounded-sm border border-[#0000000D] transition-colors duration-300 ease-in-out cursor-pointer"
+              disabled={loading}
+              className="w-full py-3 px-2 mt-2 font-semibold text-white rounded-sm border border-[#0000000D] transition-colors duration-300 ease-in-out cursor-pointer flex items-center justify-center"
               style={{ backgroundColor: "var(--primary-color)" }}
               onMouseEnter={(e) =>
-                (e.currentTarget.style.backgroundColor = "var(--btn-hover-bg)")
-              }
+                (e.currentTarget.style.backgroundColor = "var(--btn-hover-bg)")}
               onMouseLeave={(e) =>
-                (e.currentTarget.style.backgroundColor = "var(--primary-color)")
-              }
+                (e.currentTarget.style.backgroundColor = "var(--primary-color)")}
             >
-              Submit
+              {loading ? (
+                <Loader2 size={18} className="animate-spin me-2" />
+              ) : null}
+              {loading ? "Processing..." : "Submit"}
             </button>
           </form>
 
